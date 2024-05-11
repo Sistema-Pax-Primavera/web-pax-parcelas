@@ -1,0 +1,157 @@
+.container-parcelas {
+  margin-top: 25px;
+  display: flex;
+  gap: 10px;
+  width: 90%;
+}
+
+.filtro-container-parcelas {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+}
+
+.container-linha-parcelas {
+  width: 70%;
+  background-color: var(--cinza-leve);
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.linha-parcelas {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.linha-parcelas2 {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+}
+
+.linha-parcelas3 {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+  }
+
+.campos-parcelas {
+  display: flex;
+  flex-direction: column;
+  width: 15%;
+}
+
+.campos-parcelas1 {
+  width: 20%;
+  margin-top: 15px;
+}
+
+.campos-parcelas label {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.options-table-parcelas {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 80%;
+}
+
+.buttons-parcelas {
+  width: 100%;
+}
+
+.valores-tabela-parcela {
+  width: 80%;
+}
+
+.valores-tabela-parcela input {
+  width: 100%;
+  text-align: center;
+  font-weight: 500;
+  background-color: var(--branco);
+  padding: 5px;
+  border: 1px solid var(--verde);
+}
+
+.selected-row {
+  background-color: #006b33 !important;
+  color: #fff;
+}
+
+.campos-parcelas2 {
+  display: flex;
+  flex-direction: column;
+  width: 15%;
+}
+
+.campos-parcelas2 label {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.campos-parcelas2 select {
+  background-color: var(--cinza-leve);
+  font-weight: 500;
+  font-size: 12pxF;
+}
+
+.campos-parcelas2 input {
+  background-color: var(--cinza-leve);
+  font-weight: 500;
+  font-size: 12pxF;
+}
+
+.campos-parcelas3 {
+  display: flex;
+  flex-direction: column;
+  width: 17%;
+}
+
+.campos-parcelas3 label {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.campos-parcelas3 input {
+  background-color: var(--cinza-leve);
+  font-weight: 500;
+  font-size: 12pxF;
+}
+
+.campos-parcelas3 select {
+  background-color: var(--cinza-leve);
+  font-weight: 500;
+  font-size: 12pxF;
+}
+
+.campos-parcelas4 {
+  display: flex;
+  flex-direction: column;
+  width: 97%;
+}
+
+.campos-parcelas4 label {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.campos-parcelas4 textarea{
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    background-color: var(--cinza-leve);
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    flex-wrap: wrap;
+    outline: none;
+    
+}

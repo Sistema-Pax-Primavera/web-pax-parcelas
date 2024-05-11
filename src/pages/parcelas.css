@@ -1,0 +1,24 @@
+.container-parcelas{
+    margin-top: 25px;
+    display: flex;
+    gap: 10px;
+    width: 88%;
+}
+
+.colunas-parcelas{
+    display: flex;
+    height: 500px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 80%;
+}
+
+.colunas-parcelas img{
+    width: 30%;
+}
+
+.colunas-parcelas h1 {
+    font-size: 20px;
+    color: var(--verde);
+}
