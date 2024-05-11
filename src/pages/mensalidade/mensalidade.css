@@ -51,6 +51,14 @@
   margin-top: 15px;
 }
 
+.campos-parcelas1 button{
+  font-size: 10px;
+  background-color: var(--verde);
+  color: var(--branco);
+  font-weight: 700;
+  padding: 10px;
+}
+
 .campos-parcelas label {
   font-size: 12px;
   font-weight: 500;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./mensalidade.css";
 import HeaderParcelas from "../../components/header-parcelas";
 import ButtonIconTextoStart from "../../components/button-icon-texto-start";
@@ -17,23 +17,33 @@ function createData(
   name,
   contrato,
   datavencimento,
-  diapagamento,
+  datapagamento,
   valor,
   formapagamento
 ) {
+  // Função para formatar a data no formato dd/mm/yyyy
+  const formatDate = (dateString) => {
+    if (!dateString) return ""; // Retorna uma string vazia se a data for falsy
+    const [day, month, year] = dateString.split("/");
+    return `${day}/${month}/${year}`;
+  };
+
   return {
     name,
     contrato,
-    datavencimento,
-    diapagamento,
+    datavencimento: formatDate(datavencimento),
+    datapagamento: formatDate(datapagamento),
     valor,
     formapagamento,
   };
 }
 
 const initialRows = [
+  createData("Carlos Ribeiro", 123456, "20/05/2024", "", "100,00", "Pix"),
+  createData("Lucas Souza", 654987, "21/05/2024", "", "100,00", "Pix"),
+  createData("Luiza Alencar", 321987, "23/05/2024", "", "100,00", "Pix"),
   createData(
-    "Carlos Ribeiro",
+    "Felipe Perez",
     123456,
     "20/05/2024",
     "20/05/2024",
@@ -41,15 +51,15 @@ const initialRows = [
     "Pix"
   ),
   createData(
-    "Lucas Souza",
+    "Larissa Costa",
     654987,
     "21/05/2024",
-    "21/05/2024",
+    "22/05/2024",
     "100,00",
     "Pix"
   ),
   createData(
-    "Luiza Alencar",
+    "José Alencar",
     321987,
     "23/05/2024",
     "23/05/2024",
@@ -62,12 +72,7 @@ const Mensalidade = () => {
   const [rows, setRows] = useState(initialRows);
   const [selectedRows, setSelectedRows] = useState([]);
   const [modalCadastroOpen, setModalCadastro] = useState(false);
-
-  const handleInputChange = (e, index, field) => {
-    const updatedRows = [...rows];
-    updatedRows[index][field] = e.target.value;
-    setRows(updatedRows);
-  };
+  const [gerarParcelaDisabled, setGerarParcelaDisabled] = useState(true);
 
   const handleRowClick = (rowName) => {
     const selectedIndex = selectedRows.indexOf(rowName);
@@ -99,6 +104,30 @@ const Mensalidade = () => {
     setModalCadastro(false);
   };
 
+  const gerarParcela = () => {
+    // Lógica para gerar parcela
+  };
+
+  useEffect(() => {
+    // Verificar se há pelo menos uma linha selecionada e se a data está informada em alguma linha
+    const hasSelectedRow = selectedRows.length > 0;
+    const hasDate = rows.some((row) => row.datavencimento.trim() !== "");
+    setGerarParcelaDisabled(!hasSelectedRow || !hasDate);
+  }, [rows, selectedRows]); // Adicionamos selectedRows como uma dependência do useEffect
+
+  const handleInputChange2 = (e, index, field) => {
+    const updatedRows = [...rows];
+    updatedRows[index][field] = e.target.value;
+    setRows(updatedRows);
+
+    // Habilitar o botão "GERAR PARCELA" se uma linha estiver selecionada e uma data for informada
+    if (selectedRows.length > 0 && e.target.value.trim() !== "") {
+      setGerarParcelaDisabled(false);
+    } else {
+      setGerarParcelaDisabled(true);
+    }
+  };
+
   return (
     <div className="container-parcelas">
       <HeaderParcelas />
@@ -125,15 +154,19 @@ const Mensalidade = () => {
                 fontSizeBotao={"10px"}
                 fontWeightBotao={700}
                 corTextoBotao={"#ffff"}
+                onClick={gerarParcela}
+                disabled={gerarParcelaDisabled}
               />
             </div>
             <div className="campos-parcelas1">
               <ButtonIconTextoStart
-                title={"ESTORNAR PARCELA"}
+                title={"GERAR PARCELA"}
+                corFundoBotao={gerarParcelaDisabled ? "#cccccc" : "#006B33"}
                 fontSizeBotao={"10px"}
                 fontWeightBotao={700}
-                corFundoBotao={"#006B33"}
                 corTextoBotao={"#ffff"}
+                funcao={gerarParcela}
+                disabled={gerarParcelaDisabled}
               />
             </div>
           </div>
@@ -176,14 +209,14 @@ const Mensalidade = () => {
             </div>
           </div>
           <div className="linha-parcelas3">
-              <div className="campos-parcelas1">
-                <ButtonIconTextoStart
-                  title={"SALVAR"}
-                  corFundoBotao={"#006B33"}
-                  fontSizeBotao={"10px"}
-                  fontWeightBotao={700}
-                  corTextoBotao={"#ffff"}
-                />
+            <div className="campos-parcelas1">
+              <ButtonIconTextoStart
+                title={"SALVAR"}
+                corFundoBotao={"#006B33"}
+                fontSizeBotao={"10px"}
+                fontWeightBotao={700}
+                corTextoBotao={"#ffff"}
+              />
             </div>
           </div>
         </ModalEdicao>
@@ -194,9 +227,15 @@ const Mensalidade = () => {
                 <TableCell>Nome</TableCell>
                 <TableCell align="center">Contrato</TableCell>
                 <TableCell align="center">Data Vencimento</TableCell>
-                <TableCell align="center">Dia Pagamento</TableCell>
-                <TableCell align="center">Valor</TableCell>
-                <TableCell align="center">Forma Pagamento</TableCell>
+                <TableCell align="center" sx={{ width: "15%" }}>
+                  Data Pagamento
+                </TableCell>
+                <TableCell align="center" sx={{ width: "13%" }}>
+                  Valor
+                </TableCell>
+                <TableCell align="center" sx={{ width: "15%" }}>
+                  Forma Pagamento
+                </TableCell>
                 <TableCell align="start">Opções</TableCell>
               </TableRow>
             </TableHead>
@@ -244,25 +283,30 @@ const Mensalidade = () => {
                       color: isSelected(row.name) ? "#fff" : "inherit",
                     }}
                   >
-                    <div className="valores-tabela-parcela">
+                    <div
+                      className="valores-tabela-parcela"
+                      style={{ width: "100%" }}
+                    >
                       <input
-                        type="text"
-                        value={row.diapagamento}
+                        value={row.datapagamento}
                         onChange={(e) =>
-                          handleInputChange(e, index, "diapagamento")
+                          handleInputChange2(e, index, "datapagamento")
                         }
                       />
                     </div>
                   </TableCell>
+
                   <TableCell
                     align="center"
                     style={{
                       color: isSelected(row.name) ? "#fff" : "inherit",
                     }}
                   >
-                    <div className="valores-tabela-parcela">
+                    <div
+                      className="valores-tabela-parcela"
+                      sx={{ width: "13%" }}
+                    >
                       <input
-                        type="text"
                         value={row.valor}
                         onChange={(e) => handleInputChange(e, index, "valor")}
                       />
@@ -274,7 +318,10 @@ const Mensalidade = () => {
                       color: isSelected(row.name) ? "#fff" : "inherit",
                     }}
                   >
-                    <div className="valores-tabela-parcela">
+                    <div
+                      className="valores-tabela-parcela"
+                      sx={{ width: "15%" }}
+                    >
                       <input
                         type="text"
                         value={row.formapagamento}
