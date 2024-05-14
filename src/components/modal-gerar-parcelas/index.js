@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import "./gerador.css";
-import HeaderParcelas from "../../components/header-parcelas";
-import Checkbox from "@mui/material/Checkbox";
-import ButtonIconTextoStart from "../../components/button-icon-texto-start";
+import React, {useState} from "react";
+import "./modal-gerar-parcelas.css";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+import ModalEdicao from "../../../../pax-cadastro/src/components/modal-edicao";
+import ButtonIconTextoStart from "../button-icon-texto-start";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -10,56 +10,59 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import Checkbox from "@mui/material/Checkbox";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
 import CreditScoreIcon from "@mui/icons-material/CreditScore";
-import ModalEdicao from "../../../../pax-cadastro/src/components/modal-edicao";
-
-function createData(name, tipo, valor, vencimento, datapagamento) {
-  return { name, tipo, valor, vencimento, datapagamento };
-}
-
-const initialRows = [
-  createData("01", "Adesão", "100,00", "20/05/2024", "20/05/2024"),
-  createData("02", "Mensalidade", "100,00", "21/05/2024", "21/05/2024"),
-  createData("03", "Mensalidade", "100,00", "22/05/2024", "22/05/2024"),
-];
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
-const Gerador = () => {
-  const [rows, setRows] = useState(initialRows);
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [discountPercentage, setDiscountPercentage] = useState(0);
-  const [modalCadastroOpen, setModalCadastro] = useState(false);
+function gerarData(name, tipo, valor, vencimento, datapagamento) {
+  return { name, tipo, valor, vencimento, datapagamento };
+}
 
-  const handleRowClick = (rowName) => {
-    const selectedIndex = selectedRows.indexOf(rowName);
+const initialGerarRows = [
+  gerarData("01", "Adesão", "100,00", "20/05/2024", "20/05/2024"),
+  gerarData("02", "Mensalidade", "100,00", "21/05/2024", "21/05/2024"),
+  gerarData("03", "Mensalidade", "100,00", "22/05/2024", "22/05/2024"),
+];
+
+const ModalGerarParcelas = ({ isOpen, onClose }) => {
+  const [gerarRows, setGerarRows] = useState(initialGerarRows);
+  const [selectedGerarRows, setSelectedGerarRows] = useState([]);
+  const [discountPercentage, setDiscountPercentage] = useState(0);
+  const [modalGerarParcelasOpen, setModalGerarParcelas] = useState(false);
+
+  const handleRowGerarClick = (rowName) => {
+    const selectedIndex = selectedGerarRows.indexOf(rowName);
     let newSelected = [];
 
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selectedRows, rowName);
+      newSelected = newSelected.concat(selectedGerarRows, rowName);
     } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selectedRows.slice(1));
-    } else if (selectedIndex === selectedRows.length - 1) {
-      newSelected = newSelected.concat(selectedRows.slice(0, -1));
+      newSelected = newSelected.concat(selectedGerarRows.slice(1));
+    } else if (selectedIndex === selectedGerarRows.length - 1) {
+      newSelected = newSelected.concat(selectedGerarRows.slice(0, -1));
     } else if (selectedIndex > 0) {
       newSelected = newSelected.concat(
-        selectedRows.slice(0, selectedIndex),
-        selectedRows.slice(selectedIndex + 1)
+        selectedGerarRows.slice(0, selectedIndex),
+        selectedGerarRows.slice(selectedIndex + 1)
       );
     }
 
-    setSelectedRows(newSelected);
+    setSelectedGerarRows(newSelected);
   };
 
-  const isSelected = (rowName) => selectedRows.indexOf(rowName) !== -1;
+  const isSelectedGerar = (rowName) =>
+    selectedGerarRows.indexOf(rowName) !== -1;
 
   const calculateTotalValue = () => {
     // Calculate the total value of selected rows
-    return selectedRows.reduce((acc, curr) => {
-      const selectedRow = rows.find((row) => row.name === curr);
-      return acc + parseFloat(selectedRow.valor.replace(",", "."));
+    return selectedGerarRows.reduce((acc, curr) => {
+      const selectedGerarRow = gerarRows.find(
+        (gerarRow) => gerarRow.name === curr
+      );
+      return acc + parseFloat(selectedGerarRow.valor.replace(",", "."));
     }, 0);
   };
 
@@ -75,18 +78,24 @@ const Gerador = () => {
     setDiscountPercentage(event.target.value);
   };
 
-  const abrirModalCadastro = () => {
-    setModalCadastro(true);
+  const abrirModalGerarParcelas = () => {
+    setModalGerarParcelas(true);
   };
 
-  const fecharModalCadastro = () => {
-    setModalCadastro(false);
+  const fecharModalGerarParcelas = () => {
+    setModalGerarParcelas(false);
   };
+
   return (
-    <div className="container-parcelas">
-      <HeaderParcelas />
-      <div className="filtro-container-parcelas">
-        <div className="container-linha-parcelas">
+    <div className={`modal ${isOpen ? "open" : ""}`}>
+      <div className="modal-content2">
+        <div className="fecha-modal-cadastro">
+          <label>Gerar Parcelas</label>
+          <button onClick={onClose}>
+            <HighlightOffIcon fontSize={"medium"} />
+          </button>
+        </div>
+        <div className="container-linha-gerador">
           <div className="linha-parcelas">
             <div className="campos-gerador-parcelas">
               <div>
@@ -129,57 +138,67 @@ const Gerador = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row) => (
+              {gerarRows.map((gerarRow) => (
                 <TableRow
-                  key={row.name}
+                  key={gerarRow.name}
                   sx={{
                     "&:last-child td, &:last-child th": { border: 0 },
-                    backgroundColor: isSelected(row.name)
+                    backgroundColor: isSelectedGerar(gerarRow.name)
                       ? "#006b33"
                       : "inherit",
-                    color: isSelected(row.name) ? "#fff" : "inherit",
+                    color: isSelectedGerar(gerarRow.name) ? "#fff" : "inherit",
                   }}
-                  onClick={() => handleRowClick(row.name)}
+                  onClick={() => handleRowGerarClick(gerarRow.name)}
                 >
                   <TableCell
                     align="start"
                     style={{
-                      color: isSelected(row.name) ? "#fff" : "inherit",
+                      color: isSelectedGerar(gerarRow.name)
+                        ? "#fff"
+                        : "inherit",
                     }}
                   >
-                    {row.name}
+                    {gerarRow.name}
                   </TableCell>
                   <TableCell
                     align="start"
                     style={{
-                      color: isSelected(row.name) ? "#fff" : "inherit",
+                      color: isSelectedGerar(gerarRow.name)
+                        ? "#fff"
+                        : "inherit",
                     }}
                   >
-                    {row.tipo}
+                    {gerarRow.tipo}
                   </TableCell>
                   <TableCell
                     align="center"
                     style={{
-                      color: isSelected(row.name) ? "#fff" : "inherit",
+                      color: isSelectedGerar(gerarRow.name)
+                        ? "#fff"
+                        : "inherit",
                     }}
                   >
-                    {row.valor}
+                    {gerarRow.valor}
                   </TableCell>
                   <TableCell
                     align="center"
                     style={{
-                      color: isSelected(row.name) ? "#fff" : "inherit",
+                      color: isSelectedGerar(gerarRow.name)
+                        ? "#fff"
+                        : "inherit",
                     }}
                   >
-                    {row.vencimento}
+                    {gerarRow.vencimento}
                   </TableCell>
                   <TableCell
                     align="center"
                     style={{
-                      color: isSelected(row.name) ? "#fff" : "inherit",
+                      color: isSelectedGerar(gerarRow.name)
+                        ? "#fff"
+                        : "inherit",
                     }}
                   >
-                    {row.datapagamento}
+                    {gerarRow.datapagamento}
                   </TableCell>
                 </TableRow>
               ))}
@@ -190,7 +209,7 @@ const Gerador = () => {
           <div className="campos-result-parce">
             <label>Quantidade</label>
             <p>
-              <AccountTreeIcon fontSize={"small"} /> {selectedRows.length}
+              <AccountTreeIcon fontSize={"small"} /> {selectedGerarRows.length}
             </p>
           </div>
           <div className="campos-result-parce">
@@ -230,14 +249,14 @@ const Gerador = () => {
               fontSizeBotao={"10px"}
               fontWeightBotao={700}
               corTextoBotao={"#ffff"}
-              funcao={() => abrirModalCadastro()}
+              funcao={() => abrirModalGerarParcelas()}
             />
           </div>
         </div>
         <ModalEdicao
           titulo="Informações do Cliente"
-          isOpen={modalCadastroOpen}
-          onClose={fecharModalCadastro}
+          isOpen={modalGerarParcelasOpen}
+          onClose={fecharModalGerarParcelas}
         >
           <div className="linha-parcelas2">
             <div className="campos-parcelas2-gerador">
@@ -276,4 +295,4 @@ const Gerador = () => {
   );
 };
 
-export default Gerador;
+export default ModalGerarParcelas;

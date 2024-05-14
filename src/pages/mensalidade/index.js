@@ -12,89 +12,49 @@ import Paper from "@mui/material/Paper";
 import ArticleIcon from "@mui/icons-material/Article";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import ModalEdicao from "../../../../pax-cadastro/src/components/modal-edicao";
+import ModalGerarParcelas from "../../components/modal-gerar-parcelas";
 
 function createData(
+  id,
   name,
-  contrato,
   datavencimento,
   datapagamento,
   valor,
   formapagamento
 ) {
-  // Função para formatar a data no formato dd/mm/yyyy
-  const formatDate = (dateString) => {
-    if (!dateString) return ""; // Retorna uma string vazia se a data for falsy
-    const [day, month, year] = dateString.split("/");
-    return `${day}/${month}/${year}`;
-  };
-
-  return {
-    name,
-    contrato,
-    datavencimento: formatDate(datavencimento),
-    datapagamento: formatDate(datapagamento),
-    valor,
-    formapagamento,
-  };
+  return { id, name, datavencimento, datapagamento, valor, formapagamento };
 }
 
-const initialRows = [
-  createData("Carlos Ribeiro", 123456, "20/05/2024", "", "100,00", "Pix"),
-  createData("Lucas Souza", 654987, "21/05/2024", "", "100,00", "Pix"),
-  createData("Luiza Alencar", 321987, "23/05/2024", "", "100,00", "Pix"),
+const rows = [
+  createData("01", "Carlos Ribeiro", "20/05/2024", "", "", "Pix"),
+  createData("02", "Carlos Ribeiro", "21/05/2024", "", "100,00", "Pix"),
+  createData("03", "Carlos Ribeiro", "23/05/2024", "", "100,00", "Pix"),
+  createData("04", "Carlos Ribeiro", "20/05/2024", "21/05/2024", "100", "Pix"),
+  createData("05", "Carlos Ribeiro", "21/05/2024", "22/05/2024", "100", "Pix"),
   createData(
-    "Felipe Perez",
-    123456,
-    "20/05/2024",
-    "20/05/2024",
-    "100,00",
-    "Pix"
-  ),
-  createData(
-    "Larissa Costa",
-    654987,
-    "21/05/2024",
-    "22/05/2024",
-    "100,00",
-    "Pix"
-  ),
-  createData(
-    "José Alencar",
-    321987,
+    "06",
+    "Carlos Ribeiro",
     "23/05/2024",
-    "23/05/2024",
+    "24/05/2024",
     "100,00",
     "Pix"
   ),
 ];
 
 const Mensalidade = () => {
-  const [rows, setRows] = useState(initialRows);
-  const [selectedRows, setSelectedRows] = useState([]);
   const [modalCadastroOpen, setModalCadastro] = useState(false);
-  const [gerarParcelaDisabled, setGerarParcelaDisabled] = useState(true);
+  const [modalGerarParcelasOpen, setModalGerarParcelas] = useState(false);
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [inputValues, setInputValues] = useState({});
+  const [isEstornoButtonEnabled, setIsEstornoButtonEnabled] = useState(false);
 
-  const handleRowClick = (rowName) => {
-    const selectedIndex = selectedRows.indexOf(rowName);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selectedRows, rowName);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selectedRows.slice(1));
-    } else if (selectedIndex === selectedRows.length - 1) {
-      newSelected = newSelected.concat(selectedRows.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selectedRows.slice(0, selectedIndex),
-        selectedRows.slice(selectedIndex + 1)
-      );
-    }
-
-    setSelectedRows(newSelected);
+  const abrirModalGerarParcelas = () => {
+    setModalGerarParcelas(true);
   };
 
-  const isSelected = (rowName) => selectedRows.indexOf(rowName) !== -1;
+  const fecharModalGerarParcelas = () => {
+    setModalGerarParcelas(false);
+  };
 
   const abrirModalCadastro = () => {
     setModalCadastro(true);
@@ -104,29 +64,74 @@ const Mensalidade = () => {
     setModalCadastro(false);
   };
 
-  const gerarParcela = () => {
-    // Lógica para gerar parcela
-  };
+  const handleRowClick = (id, event) => {
+    const targetTag = event.target.tagName.toLowerCase();
+    if (targetTag !== "input") {
+      const selectedIndex = selectedRows.indexOf(id);
+      let newSelected = [];
 
-  useEffect(() => {
-    // Verificar se há pelo menos uma linha selecionada e se a data está informada em alguma linha
-    const hasSelectedRow = selectedRows.length > 0;
-    const hasDate = rows.some((row) => row.datavencimento.trim() !== "");
-    setGerarParcelaDisabled(!hasSelectedRow || !hasDate);
-  }, [rows, selectedRows]); // Adicionamos selectedRows como uma dependência do useEffect
+      if (selectedIndex === -1) {
+        newSelected = newSelected.concat(selectedRows, id);
+      } else if (selectedIndex === 0) {
+        newSelected = newSelected.concat(selectedRows.slice(1));
+      } else if (selectedIndex === selectedRows.length - 1) {
+        newSelected = newSelected.concat(selectedRows.slice(0, -1));
+      } else if (selectedIndex > 0) {
+        newSelected = newSelected.concat(
+          selectedRows.slice(0, selectedIndex),
+          selectedRows.slice(selectedIndex + 1)
+        );
+      }
 
-  const handleInputChange2 = (e, index, field) => {
-    const updatedRows = [...rows];
-    updatedRows[index][field] = e.target.value;
-    setRows(updatedRows);
-
-    // Habilitar o botão "GERAR PARCELA" se uma linha estiver selecionada e uma data for informada
-    if (selectedRows.length > 0 && e.target.value.trim() !== "") {
-      setGerarParcelaDisabled(false);
-    } else {
-      setGerarParcelaDisabled(true);
+      setSelectedRows(newSelected);
     }
   };
+
+  const handleInputChange = (id, field, value) => {
+    setInputValues((prevState) => ({
+      ...prevState,
+      [id]: {
+        ...prevState[id],
+        [field]: value,
+      },
+    }));
+  };
+
+  const isEstornoEnabled = () => {
+    // Verifica se pelo menos uma linha está selecionada
+    if (selectedRows.length === 0) return false;
+  
+    // Verifica se todas as linhas selecionadas têm os campos preenchidos
+    const allSelectedRowsWithData = selectedRows.every((rowId) => {
+      const inputValue = inputValues[rowId];
+      const row = rows.find((row) => row.id === rowId);
+  
+      // Verifica se todos os campos obrigatórios estão preenchidos
+      return (
+        (inputValue && inputValue.datapagamento && inputValue.valor && inputValue.formapagamento) || // Verifica se os inputs têm valor
+        (row && row.datapagamento && row.valor && row.formapagamento) // Verifica se a linha original (rows) tem valor
+      );
+    });
+  
+    return allSelectedRowsWithData;
+  };
+  
+  useEffect(() => {
+    setIsEstornoButtonEnabled(isEstornoEnabled());
+  }, [selectedRows, inputValues]);
+  
+
+  useEffect(() => {
+    const initialValues = {};
+    rows.forEach((row) => {
+      initialValues[row.id] = {
+        datapagamento: row.datapagamento || "",
+        valor: row.valor || "",
+        formapagamento: row.formapagamento || "",
+      };
+    });
+    setInputValues(initialValues);
+  }, []);
 
   return (
     <div className="container-parcelas">
@@ -154,23 +159,28 @@ const Mensalidade = () => {
                 fontSizeBotao={"10px"}
                 fontWeightBotao={700}
                 corTextoBotao={"#ffff"}
-                onClick={gerarParcela}
-                disabled={gerarParcelaDisabled}
+                funcao={abrirModalGerarParcelas}
               />
             </div>
-            <div className="campos-parcelas1">
-              <ButtonIconTextoStart
-                title={"GERAR PARCELA"}
-                corFundoBotao={gerarParcelaDisabled ? "#cccccc" : "#006B33"}
-                fontSizeBotao={"10px"}
-                fontWeightBotao={700}
-                corTextoBotao={"#ffff"}
-                funcao={gerarParcela}
-                disabled={gerarParcelaDisabled}
-              />
+            <div className="disabled-button">
+              <button
+                className={isEstornoButtonEnabled ? "" : "disabled-button"}
+                disabled={!isEstornoButtonEnabled}
+                style={{
+                  backgroundColor: isEstornoButtonEnabled ? "#006b33" : "#ccc",
+                }} // verde se habilitado, cinza se desabilitado
+              >
+                ESTORNAR PARCELA
+              </button>
             </div>
           </div>
         </div>
+
+        <ModalGerarParcelas
+          isOpen={modalGerarParcelasOpen}
+          onClose={fecharModalGerarParcelas}
+        ></ModalGerarParcelas>
+
         <ModalEdicao
           titulo="Informações do Cliente"
           isOpen={modalCadastroOpen}
@@ -224,113 +234,109 @@ const Mensalidade = () => {
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
+                <TableCell>ID</TableCell>
                 <TableCell>Nome</TableCell>
-                <TableCell align="center">Contrato</TableCell>
                 <TableCell align="center">Data Vencimento</TableCell>
-                <TableCell align="center" sx={{ width: "15%" }}>
+                <TableCell
+                  align="center"
+                  className="valores-tabela-parcela"
+                  sx={{ width: "15%" }}
+                >
                   Data Pagamento
                 </TableCell>
-                <TableCell align="center" sx={{ width: "13%" }}>
+                <TableCell
+                  align="center"
+                  className="valores-tabela-parcela"
+                  sx={{ width: "15%" }}
+                >
                   Valor
                 </TableCell>
-                <TableCell align="center" sx={{ width: "15%" }}>
+                <TableCell
+                  align="center"
+                  className="valores-tabela-parcela"
+                  sx={{ width: "15%" }}
+                >
                   Forma Pagamento
                 </TableCell>
-                <TableCell align="start">Opções</TableCell>
+                <TableCell align="center">Opções</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row, index) => (
+              {rows.map((row) => (
                 <TableRow
-                  key={row.name}
+                  key={row.id}
                   sx={{
                     "&:last-child td, &:last-child th": { border: 0 },
-                    backgroundColor: isSelected(row.name)
-                      ? "#006b33"
-                      : "inherit",
-                    color: isSelected(row.name) ? "#fff" : "inherit",
+                    cursor: "pointer",
+                    backgroundColor:
+                      selectedRows.indexOf(row.id) !== -1
+                        ? "#e0e0e0"
+                        : "inherit",
                   }}
-                  onClick={() => handleRowClick(row.name)}
+                  onClick={(event) => handleRowClick(row.id, event)}
                 >
-                  <TableCell
-                    component="th"
-                    scope="row"
-                    style={{
-                      color: isSelected(row.name) ? "#fff" : "inherit",
-                    }}
-                  >
+                  <TableCell component="th" scope="row">
+                    {row.id}
+                  </TableCell>
+                  <TableCell component="th" scope="row">
                     {row.name}
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    style={{
-                      color: isSelected(row.name) ? "#fff" : "inherit",
-                    }}
-                  >
-                    {row.contrato}
-                  </TableCell>
-                  <TableCell
-                    align="center"
-                    style={{
-                      color: isSelected(row.name) ? "#fff" : "inherit",
-                    }}
-                  >
+                  <TableCell component="th" scope="row">
                     {row.datavencimento}
                   </TableCell>
                   <TableCell
                     align="center"
-                    style={{
-                      color: isSelected(row.name) ? "#fff" : "inherit",
-                    }}
+                    className="valores-tabela-parcela"
+                    sx={{ width: "15%" }}
                   >
-                    <div
-                      className="valores-tabela-parcela"
-                      style={{ width: "100%" }}
-                    >
-                      <input
-                        value={row.datapagamento}
-                        onChange={(e) =>
-                          handleInputChange2(e, index, "datapagamento")
-                        }
-                      />
-                    </div>
+                    <input
+                      value={
+                        inputValues[row.id]?.datapagamento ||
+                        row.datapagamento ||
+                        ""
+                      }
+                      onChange={(e) =>
+                        handleInputChange(
+                          row.id,
+                          "datapagamento",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    className="valores-tabela-parcela"
+                    sx={{ width: "15%" }}
+                  >
+                    <input
+                      value={inputValues[row.id]?.valor || row.valor || ""}
+                      onChange={(e) =>
+                        handleInputChange(row.id, "valor", e.target.value)
+                      }
+                    />
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    className="valores-tabela-parcela"
+                    sx={{ width: "15%" }}
+                  >
+                    <input
+                      value={
+                        inputValues[row.id]?.formapagamento ||
+                        row.formapagamento ||
+                        ""
+                      }
+                      onChange={(e) =>
+                        handleInputChange(
+                          row.id,
+                          "formapagamento",
+                          e.target.value
+                        )
+                      }
+                    />
                   </TableCell>
 
-                  <TableCell
-                    align="center"
-                    style={{
-                      color: isSelected(row.name) ? "#fff" : "inherit",
-                    }}
-                  >
-                    <div
-                      className="valores-tabela-parcela"
-                      sx={{ width: "13%" }}
-                    >
-                      <input
-                        value={row.valor}
-                        onChange={(e) => handleInputChange(e, index, "valor")}
-                      />
-                    </div>
-                  </TableCell>
-                  <TableCell
-                    align="center"
-                    style={{
-                      color: isSelected(row.name) ? "#fff" : "inherit",
-                    }}
-                  >
-                    <div
-                      className="valores-tabela-parcela"
-                      sx={{ width: "15%" }}
-                    >
-                      <input
-                        type="text"
-                        value={row.formapagamento}
-                        onChange={(e) =>
-                          handleInputChange(e, index, "formapagamento")
-                        }
-                      />
-                    </div>
-                  </TableCell>
                   <TableCell align="center">
                     <div className="options-table-parcelas">
                       <ButtonIconTextoStart

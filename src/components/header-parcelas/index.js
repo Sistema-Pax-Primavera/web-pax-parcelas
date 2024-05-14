@@ -35,11 +35,7 @@ const HeaderParcelas = () => {
         className={activeRoute === "/mensalidade" ? "active" : ""}
       >Mensalidade
       </button>
-      <button
-        onClick={() => handleMenuClick("/gerador")}
-        className={activeRoute === "/gerador" ? "active" : ""}
-      > Gerador
-      </button>
+      
       
 
     </div>
