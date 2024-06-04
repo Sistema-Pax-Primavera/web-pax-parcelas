@@ -7,7 +7,7 @@ function App() {
     return (
         <>
             <RoutesApp />
-            <ToastContainer />
+            <ToastContainer autoClose={3000} />
         </>
     );
 }
